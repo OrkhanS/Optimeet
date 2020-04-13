@@ -29,6 +29,13 @@ class UserSerializer(serializers.ModelSerializer):
         account.save()
         return account
 
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id","content","date", "lang")
+        read_only_fields = ("id","content","date", "lang")
+
 class MinimalUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

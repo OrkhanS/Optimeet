@@ -28,6 +28,7 @@ class User(AbstractBaseUser, PermissionsMixin,SimpleEmailConfirmationUserMixin):
     language2 = models.CharField(verbose_name="Second Language",default="false",blank = True, max_length=255)
     #language3 = models.CharField(verbose_name="Third Language",default="false", max_length=255)
     #language4 = models.CharField(verbose_name="Language 4",default="false", max_length=255)
+    wantstoMatch = models.BooleanField(verbose_name="Does user want to Match someone?",default=False)
 
     is_staff = models.BooleanField(
         verbose_name="staff status",
@@ -85,7 +86,13 @@ class BriddgyCities(models.Model):
     capital = models.CharField(max_length=100, null=True)
     population = models.IntegerField(null=True)
     id_ofcity = models.IntegerField(null=True)
-     
+
+class Posts(models.Model):
+    content = models.CharField(verbose_name="Content", max_length=2000, blank=False, null=False)
+    owner = models.OneToOneField(User, related_name="Owner of Post",null=False, on_delete=models.CASCADE, blank=False)
+    date = models.DateTimeField(auto_now_add=True)
+    lang = models.CharField(verbose_name="Language",blank = False,null=False,max_length=255)
+
 class Notification(models.Model):
     owner = models.OneToOneField(User, related_name="notifications",null=False, on_delete=models.CASCADE, blank=False)
     content = models.CharField(verbose_name="Address", max_length=255, default=False)

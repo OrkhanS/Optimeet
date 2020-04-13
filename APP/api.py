@@ -97,39 +97,86 @@ class CurrentUser(APIView):
         serializer = MinimalUserSerializer(User.objects.get(id=request.user.id))
         return Response(serializer.data)
 
+#-------------------------------------------------------------------POSTS-------------------------------------------------------------------
+class PostList(generics.ListAPIView, APIView):
+    queryset = Posts.objects.all()
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        model = Posts.objects.all().order_by("-id")
+        request = self.request
+        lang1 = request.GET.get("lang1",None)
+        lang2 = request.GET.get("lang2",None)
+        if lang1:
+            model=model.filter(lang=lang1)
+        if lang2:
+            model=model.filter(lang=lang2)
+        if request.user.is_authenticated:
+            model=model.exclude(owner=request.user)
+        return model
+
+    def post(self, request):
+        serializer = PostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(owner=request.user)
+            userPosts=Posts.objects.get(owner=request.user)
+            userPosts.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, id):
+        Posts.objects.get(id=id).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class OrdersOfCurrentUser(generics.ListAPIView):
+    serializer_class = PostSerializer
+    def get_queryset(self):
+        request = self.request
+        model = Posts.objects.filter(owner=request.user.id).order_by("-id")
+        return model
+
+
 #-------------------------------------------------------------------RANDOM-------------------------------------------------------------------
-class MatchAlgorithmByLanguage(APIView):
+class IwantToMatchSomeone(APIView):
     def get(self, request):
-        # Get user's languages
+        # if user has already matched today, say else forbidden
         if request.user.hasMatchedToday == False:
             request = self.request
             id = request.user.id
             me = MinimalUserSerializer(User.objects.get(pk=id))
+            # get users' languages
             languages = []
             languages.append(me["language1"].value)
             languages.append(me["language2"].value)
-            # languages.append(me.language3)
-            # languages.append(me.language4)
 
             if languages[1] != "false":
                 users = User.objects.filter( Q(language1 = languages[0]) | Q(language2 = languages[0]) | Q(language1 = languages[1]) | Q(language2 = languages[1]) ).exclude(pk=request.user.id)
             else:
                 users = User.objects.filter( Q(language1 = languages[0]) | Q(language2 = languages[0]) ).exclude(pk=request.user.id)
-            userList = list(users) 
+            users = users.exclude(wantstoMatch = False)
+            # exclude current user and who doesn't want to match
+            userList = list(users)
             count = len(userList)
             flag = 1
             hasMatched = False
             serializer = MinimalUserSerializer(userList, many=True)
 
+            #loop throug the list of users
             while(flag == 1):
+                #if there is no user that I can match then make my wantstoMatch field True
                 if len(userList) == 0:
+                    userNow = User.objects.get(pk = request.user.id)
+                    userNow.wantstoMatch = True
                     return Response(status=status.HTTP_204_NO_CONTENT)
                 count = len(userList)
                 random = randint(0, count - 1)
                 hasMatched = False
                 hasMatched = Matches.objects.filter(user1 = request.user, user2 = userList[random]).exists() or Matches.objects.filter(user1 = userList[random], user2 = request.user).exists()
+                
+                #if user already matched with some user then remove him from list
                 if hasMatched:
                     userList.remove(userList[random])
+                # if user hasn't watched with him and he hasn't matched with anyone today
                 if not hasMatched and userList[random].hasMatchedToday == False:
                     flag = 0
                     random_object = userList[random]
@@ -138,13 +185,71 @@ class MatchAlgorithmByLanguage(APIView):
                     user1 = User.objects.get(pk = request.user.id)
                     user2 = User.objects.get(pk = userList[random].id)
                     user1.hasMatchedToday = True
+                    user1.wantstoMatch = False
+                    user2.wantstoMatch = False
                     user2.hasMatchedToday = True
                     user1.save()
                     user2.save()
                     return Response(serializer.data, status=status.HTTP_200_OK)
             return Response({"data":"There is a problem, please wait"}, status=status.HTTP_204_NO_CONTENT)
+
         else:
-            return Response({"data":"You have already matched today"}, status=status.HTTP_400_BAD_REQUEST)
+            Response(status=status.HTTP_403_FORBIDDEN)
+    # to say I don't want to match today
+    def delete(self, request, id):
+        request = self.request
+        id = request.user.id
+        user=User.objects.get(id=id)
+        user.wantstoMatch = False
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+# class MatchAlgorithmByLanguage(APIView):
+#     def get(self, request):
+#         # Get user's languages
+#         if request.user.hasMatchedToday == False:
+#             request = self.request
+#             id = request.user.id
+#             me = MinimalUserSerializer(User.objects.get(pk=id))
+#             languages = []
+#             languages.append(me["language1"].value)
+#             languages.append(me["language2"].value)
+#             # languages.append(me.language3)
+#             # languages.append(me.language4)
+
+#             if languages[1] != "false":
+#                 users = User.objects.filter( Q(language1 = languages[0]) | Q(language2 = languages[0]) | Q(language1 = languages[1]) | Q(language2 = languages[1]) ).exclude(pk=request.user.id)
+#             else:
+#                 users = User.objects.filter( Q(language1 = languages[0]) | Q(language2 = languages[0]) ).exclude(pk=request.user.id)
+#             userList = list(users) 
+#             count = len(userList)
+#             flag = 1
+#             hasMatched = False
+#             serializer = MinimalUserSerializer(userList, many=True)
+
+#             while(flag == 1):
+#                 if len(userList) == 0:
+#                     return Response(status=status.HTTP_204_NO_CONTENT)
+#                 count = len(userList)
+#                 random = randint(0, count - 1)
+#                 hasMatched = False
+#                 hasMatched = Matches.objects.filter(user1 = request.user, user2 = userList[random]).exists() or Matches.objects.filter(user1 = userList[random], user2 = request.user).exists()
+#                 if hasMatched:
+#                     userList.remove(userList[random])
+#                 if not hasMatched and userList[random].hasMatchedToday == False:
+#                     flag = 0
+#                     random_object = userList[random]
+#                     Matches.objects.create(user1 = request.user, user2 = random_object)    
+#                     serializer = MinimalUserSerializer(random_object)
+#                     user1 = User.objects.get(pk = request.user.id)
+#                     user2 = User.objects.get(pk = userList[random].id)
+#                     user1.hasMatchedToday = True
+#                     user2.hasMatchedToday = True
+#                     user1.save()
+#                     user2.save()
+#                     return Response(serializer.data, status=status.HTTP_200_OK)
+#             return Response({"data":"There is a problem, please wait"}, status=status.HTTP_204_NO_CONTENT)
+#         else:
+#             return Response({"data":"You have already matched today"}, status=status.HTTP_400_BAD_REQUEST)
 
 class AfterSeeingAdsRematch(APIView):
     def get(self, request):
@@ -157,7 +262,6 @@ class AfterSeeingAdsRematch(APIView):
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
 #----------------------------------------------------------------Show Messages After Pay---------------------------------------------------------------------
 class CloseUsersAccessToRoom(APIView):
     def get(self, request, room_id):
@@ -169,7 +273,6 @@ class CloseUsersAccessToRoom(APIView):
             return Response(status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
 
 class OpenUsersAccessToRoom(APIView):
     def get(self, request, room_id):

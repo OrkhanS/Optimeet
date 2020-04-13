@@ -30,7 +30,7 @@ urlpatterns = [
     url('api/chat/readlast',ReadLastChats.as_view() ,name="Read the last messages"),
 
     #------------------------------------------Suggestions--------------------------------------
-    url(r'api/match/', MatchAlgorithmByLanguage.as_view(),name="Get Your Match"),
+    url(r'api/match/', IwantToMatchSomeone.as_view(),name="Get Your Match"),
     
    
     #------------------------------------------FileUload------------------------------------------
