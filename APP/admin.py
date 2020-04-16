@@ -8,3 +8,5 @@ admin.site.register(Matches)
 admin.site.register(BriddgyCities)
 admin.site.register(Messages)
 admin.site.register(Pictures)
+admin.site.register(Posts)
+

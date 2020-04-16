@@ -45,7 +45,16 @@ class UserList(generics.ListAPIView, APIView):
     queryset = User.objects.all()
     serializer_class = MinimalUserSerializer
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        newData = {
+            "email":request.data["email"],
+            "gender": request.data['gender'],
+            "language1":request.data['language1'],
+            "language2":request.data['language2'],
+            "password":request.data['password'],
+            "password2":request.data['password2'],
+            "wantstoMatch":True
+        }
+        serializer = UserSerializer(data=newData)
         if serializer.is_valid():
             user = serializer.save()
             token, created = Token.objects.get_or_create(user=user)
@@ -98,6 +107,7 @@ class CurrentUser(APIView):
         return Response(serializer.data)
 
 #-------------------------------------------------------------------POSTS-------------------------------------------------------------------
+@permission_classes((AllowAny, ))
 class PostList(generics.ListAPIView, APIView):
     queryset = Posts.objects.all()
     serializer_class = PostSerializer
@@ -112,15 +122,22 @@ class PostList(generics.ListAPIView, APIView):
         if lang2:
             model=model.filter(lang=lang2)
         if request.user.is_authenticated:
-            model=model.exclude(owner=request.user)
+            model=model.exclude(ownerPost=request.user.id)
         return model
 
     def post(self, request):
-        serializer = PostSerializer(data=request.data)
+        newData = {
+            "ownerPost":request.user.id,
+            "content":request.data['content'],
+            "lang": request.data['lang']
+        }
+        serializer = PostSerializer(data=newData)
         if serializer.is_valid():
-            serializer.save(owner=request.user)
-            userPosts=Posts.objects.get(owner=request.user)
-            userPosts.save()
+            post = serializer.save(ownerPost=request.user)
+            post.ownerPost=request.user
+            post.content = request.data['content'] 
+            post.lang = request.data['lang'] 
+            post.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -128,11 +145,11 @@ class PostList(generics.ListAPIView, APIView):
         Posts.objects.get(id=id).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class OrdersOfCurrentUser(generics.ListAPIView):
+class PostsOfCurrentUser(generics.ListAPIView):
     serializer_class = PostSerializer
     def get_queryset(self):
         request = self.request
-        model = Posts.objects.filter(owner=request.user.id).order_by("-id")
+        model = Posts.objects.filter(ownerPost=request.user.id).order_by("-id")
         return model
 
 

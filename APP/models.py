@@ -19,16 +19,16 @@ class User(AbstractBaseUser, PermissionsMixin,SimpleEmailConfirmationUserMixin):
     is_photo_verified = models.BooleanField(verbose_name="Is the photo verified",default=False)
     hasMatchedToday = models.BooleanField(verbose_name="Has user matched today",default=False)
 
-    first_name = models.CharField(verbose_name="first name", max_length=30, blank=False)
-    last_name = models.CharField(verbose_name="last name", max_length=150, blank=False)
-    email = models.EmailField(verbose_name="email address", blank=False, unique=True)
+    # first_name = models.CharField(verbose_name="first name", max_length=30, blank=False)
+    # last_name = models.CharField(verbose_name="last name", max_length=150, blank=False)
+    email = models.CharField(verbose_name="Username",max_length=200, blank=False, unique=True)
     gender = models.CharField(verbose_name="Gender",blank=False, null=False, max_length=255)
     rating = models.FloatField(verbose_name="Rating", null=True, default=0)
     language1 = models.CharField(verbose_name="First Language",blank = False,null=False,max_length=255)
     language2 = models.CharField(verbose_name="Second Language",default="false",blank = True, max_length=255)
     #language3 = models.CharField(verbose_name="Third Language",default="false", max_length=255)
     #language4 = models.CharField(verbose_name="Language 4",default="false", max_length=255)
-    wantstoMatch = models.BooleanField(verbose_name="Does user want to Match someone?",default=False)
+    wantstoMatch = models.BooleanField(verbose_name="does user want to Match someone?",default=False)
 
     is_staff = models.BooleanField(
         verbose_name="staff status",
@@ -88,10 +88,10 @@ class BriddgyCities(models.Model):
     id_ofcity = models.IntegerField(null=True)
 
 class Posts(models.Model):
-    content = models.CharField(verbose_name="Content", max_length=2000, blank=False, null=False)
-    owner = models.OneToOneField(User, related_name="Owner of Post",null=False, on_delete=models.CASCADE, blank=False)
+    content = models.CharField(verbose_name="contentofPost", max_length=2000, blank=False, null=False)
+    ownerPost = models.ForeignKey(User, related_name="post", on_delete=models.CASCADE, blank=False)
     date = models.DateTimeField(auto_now_add=True)
-    lang = models.CharField(verbose_name="Language",blank = False,null=False,max_length=255)
+    lang = models.CharField(verbose_name="language",blank = False,null=False,max_length=255)
 
 class Notification(models.Model):
     owner = models.OneToOneField(User, related_name="notifications",null=False, on_delete=models.CASCADE, blank=False)

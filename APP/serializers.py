@@ -7,7 +7,7 @@ class UserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)    
     class Meta:
         model = User
-        fields = ('id','first_name','last_name','email','is_active','is_staff', 'rating', 'is_number_verified','is_email_verified','is_photo_verified','password','password2','avatarpic','deviceToken',"online","last_online", 'language1','language2','gender')
+        fields = ('id','email','is_active','is_staff', 'rating', 'is_number_verified','is_email_verified','is_photo_verified','password','password2','avatarpic','deviceToken',"online","last_online", 'language1','language2','gender')
         extra_kwargs = {
             'password':{'write_only':True}
         }
@@ -15,8 +15,6 @@ class UserSerializer(serializers.ModelSerializer):
     def save(self):
         account = User(
             email=self.validated_data['email'],
-            first_name=self.validated_data['first_name'],
-            last_name=self.validated_data['last_name'],
             is_staff=True,
             is_superuser=True,
         )
@@ -32,15 +30,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ("id","content","date", "lang")
-        read_only_fields = ("id","content","date", "lang")
+        model = Posts
+        fields = ("id","ownerPost","content","date", "lang")
 
 class MinimalUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id","first_name","last_name","email","is_number_verified","is_email_verified","hasMatchedToday","is_photo_verified",'last_login','rating','avatarpic',"last_online",'online', 'language1','language2','gender')
-        read_only_fields = ("id","first_name","last_name","email","is_number_verified","is_email_verified","is_photo_verified",'last_login','rating','avatarpic',"last_online",'online', 'language1','language2','gender')
+        fields = ("id","email","is_number_verified","is_email_verified","hasMatchedToday","is_photo_verified",'last_login','rating','avatarpic',"last_online",'online', 'language1','language2','gender')
+        read_only_fields = ("id","email","is_number_verified","is_email_verified","is_photo_verified",'last_login','rating','avatarpic',"last_online",'online')
 
 class MatchByLanguageSerializer(serializers.ModelSerializer):
     class Meta:

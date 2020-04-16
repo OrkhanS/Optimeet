@@ -25,7 +25,7 @@ SECRET_KEY = '&xv!=pcm2tkgu%@^l9o=d(x$!p%6nl3rv$_0z)wpe7nr@e4p=1'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '*']
+ALLOWED_HOSTS = ['127.0.0.1', '*',"85.187.128.32"]
 
 
 # Application definition
@@ -111,12 +111,24 @@ ASGI_APPLICATION = 'optimeet.routing.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'briddgyc_optimeet',
+#         'USER' : 'briddgyc_rustam',
+#         'PASSWORD' : 'Decemption@111',
+#         'HOST' : 'localhost',
+#         'PORT' : '5432'
+#     }
+#     }   
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
 
 AUTH_USER_MODEL = 'APP.User'
 
