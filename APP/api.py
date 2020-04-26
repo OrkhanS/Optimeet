@@ -106,7 +106,7 @@ class CurrentUser(APIView):
         serializer = MinimalUserSerializer(User.objects.get(id=request.user.id))
         return Response(serializer.data)
 
-#-------------------------------------------------------------------POSTS-------------------------------------------------------------------
+#-------------------------------------------------------------------POSTS------------------------------------------------------------------
 @permission_classes((AllowAny, ))
 class PostList(generics.ListAPIView, APIView):
     queryset = Posts.objects.all()
@@ -119,10 +119,15 @@ class PostList(generics.ListAPIView, APIView):
         lang2 = request.GET.get("lang2",None)
         if lang1:
             model=model.filter(lang=lang1)
+            if request.user.is_authenticated:
+                model=model.exclude(ownerPost=request.user.id)
         if lang2:
-            model=model.filter(lang=lang2)
-        if request.user.is_authenticated:
-            model=model.exclude(ownerPost=request.user.id)
+            model2 = Posts.objects.all().order_by("-id")
+            model2=model2.filter(lang=lang2)
+            if request.user.is_authenticated:
+                model2=model2.exclude(ownerPost=request.user.id)
+            model = list(model)+list(model2)
+
         return model
 
     def post(self, request):
