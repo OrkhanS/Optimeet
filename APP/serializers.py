@@ -23,7 +23,6 @@ class UserSerializer(serializers.ModelSerializer):
         language1 = self.validated_data['language1']
         language2 = self.validated_data['language2']
         gender = self.validated_data['gender']
-        deviceToken = self.validated_data['deviceToken']
 
         if password!=password2:
             raise serializers.ValidationError({'password':'Passwords do not match'})
