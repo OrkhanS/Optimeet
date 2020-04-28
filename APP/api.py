@@ -87,7 +87,7 @@ class UserDetail(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request):
+    def delete(self, request, id):
         request = self.request
         if request.user.is_authenticated:
             if not self.getUserInfo(self.kwargs.get("id")):
@@ -141,12 +141,12 @@ class PostList(generics.ListAPIView, APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request):
-        request = self.request
-        if request.user.is_authenticated:
-            Posts.objects.get(id=self.kwargs.get("id")).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response('Error!', status=status.HTTP_400_BAD_REQUEST)
+    # def delete(self, request, id):
+    #     request = self.request
+    #     if request.user.is_authenticated:
+    #         postToDelete = Posts.objects.get(id=id)
+    #         return Response(status=status.HTTP_204_NO_CONTENT)
+    #     return Response('Error!', status=status.HTTP_400_BAD_REQUEST)
 
 class PostsOfCurrentUser(generics.ListAPIView):
     serializer_class = PostSerializer
