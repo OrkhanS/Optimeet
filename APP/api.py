@@ -90,10 +90,11 @@ class UserDetail(APIView):
     def delete(self, request, id):
         request = self.request
         if request.user.is_authenticated:
-            if not self.getUserInfo(self.kwargs.get("id")):
-                return Response('User Not Found', status=status.HTTP_404_NOT_FOUND)
-            User.objects.get(id=self.kwargs.get("id")).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            if str(request.user.id) == str(id):
+                if not self.getUserInfo(self.kwargs.get("id")):
+                    return Response('User Not Found', status=status.HTTP_404_NOT_FOUND)
+                User.objects.get(id=self.kwargs.get("id")).delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
         return Response('Error!', status=status.HTTP_400_BAD_REQUEST)
 
 class CurrentUser(APIView):
