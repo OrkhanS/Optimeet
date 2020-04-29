@@ -182,7 +182,7 @@ class IwantToMatchSomeone(APIView):
             hasMatched = False
             serializer = MinimalUserSerializer(userList, many=True)
 
-            #loop throug the list of users
+            #loop through the list of users
             while(flag == 1):
                 #if there is no user that I can match then make my wantstoMatch field True
                 if len(userList) == 0:
@@ -212,7 +212,7 @@ class IwantToMatchSomeone(APIView):
                     user1.save()
                     user2.save()
                     return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response({"data":"There is a problem, please wait"}, status=status.HTTP_204_NO_CONTENT)
+            return Response({"data":"There is a problem, please wait"}, status=status.HTTP_403_FORBIDDEN)
 
         else:
             Response(status=status.HTTP_403_FORBIDDEN)
