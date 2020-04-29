@@ -28,7 +28,7 @@ class User(AbstractBaseUser, PermissionsMixin,SimpleEmailConfirmationUserMixin):
     language2 = models.CharField(verbose_name="Second Language",default="false",blank = True, max_length=255)
     #language3 = models.CharField(verbose_name="Third Language",default="false", max_length=255)
     #language4 = models.CharField(verbose_name="Language 4",default="false", max_length=255)
-    wantstoMatch = models.BooleanField(verbose_name="does user want to Match someone?",default=False)
+    wantstoMatch = models.BooleanField(verbose_name="does user want to Match someone?",default=True)
 
     is_staff = models.BooleanField(
         verbose_name="staff status",
