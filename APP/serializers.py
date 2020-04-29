@@ -7,7 +7,7 @@ class UserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)    
     class Meta:
         model = User
-        fields = ('id','email','is_active','is_staff', 'rating', 'is_number_verified','is_email_verified','is_photo_verified','password','password2','avatarpic','deviceToken',"online","last_online", 'language1','language2','gender')
+        fields = ('id','email','is_active','is_staff', 'rating', 'is_number_verified','is_email_verified','is_photo_verified','password','password2','avatarpic','deviceToken',"online","last_online", 'language1','language2','gender', 'wantstoMatch')
         extra_kwargs = {
             'password':{'write_only':True}
         }
@@ -15,11 +15,17 @@ class UserSerializer(serializers.ModelSerializer):
     def save(self):
         account = User(
             email=self.validated_data['email'],
+            language1 = self.validated_data['language1'],
+            language2 = self.validated_data['language2'],
+            gender = self.validated_data['gender'],
+            wantstoMatch = True,
             is_staff=True,
             is_superuser=True,
+            
         )
         password = self.validated_data['password']
         password2 = self.validated_data['password2']
+        
 
         if password!=password2:
             raise serializers.ValidationError({'password':'Passwords do not match'})

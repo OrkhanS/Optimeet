@@ -76,30 +76,26 @@ class UserDetail(APIView):
         serializer = UserSerializer(self.getUserInfo(id))
         return Response(serializer.data)
 
-    #Patch not working
-    def patch(self, request, id):
-        if not self.getUserInfo(id):
-            return Response('User Not Found', status=status.HTTP_404_NOT_FOUND)
-        serializer = UserSerializer(self.getUserInfo(id), data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_206_PARTIAL_CONTENT)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
     def put(self, request, id):
-        if not self.getUserInfo(id):
-            return Response('User Not Found', status=status.HTTP_404_NOT_FOUND)
-        serializer = UserSerializer(self.getUserInfo(id), data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        request = self.request
+        if request.user.is_authenticated:
+            if not self.getUserInfo(id):
+                return Response('User Not Found', status=status.HTTP_404_NOT_FOUND)
+            serializer = UserSerializer(self.getUserInfo(id), data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, id):
-        if not self.getUserInfo(id):
-            return Response('User Not Found', status=status.HTTP_404_NOT_FOUND)
-        User.objects.get(id=id).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        request = self.request
+        if request.user.is_authenticated:
+            if str(request.user.id) == str(id):
+                if not self.getUserInfo(self.kwargs.get("id")):
+                    return Response('User Not Found', status=status.HTTP_404_NOT_FOUND)
+                User.objects.get(id=self.kwargs.get("id")).delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response('Error!', status=status.HTTP_400_BAD_REQUEST)
 
 class CurrentUser(APIView):
     def get(self, request):
@@ -146,9 +142,12 @@ class PostList(generics.ListAPIView, APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, id):
-        Posts.objects.get(id=id).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    # def delete(self, request, id):
+    #     request = self.request
+    #     if request.user.is_authenticated:
+    #         postToDelete = Posts.objects.get(id=id)
+    #         return Response(status=status.HTTP_204_NO_CONTENT)
+    #     return Response('Error!', status=status.HTTP_400_BAD_REQUEST)
 
 class PostsOfCurrentUser(generics.ListAPIView):
     serializer_class = PostSerializer
@@ -183,7 +182,7 @@ class IwantToMatchSomeone(APIView):
             hasMatched = False
             serializer = MinimalUserSerializer(userList, many=True)
 
-            #loop throug the list of users
+            #loop through the list of users
             while(flag == 1):
                 #if there is no user that I can match then make my wantstoMatch field True
                 if len(userList) == 0:
@@ -213,7 +212,7 @@ class IwantToMatchSomeone(APIView):
                     user1.save()
                     user2.save()
                     return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response({"data":"There is a problem, please wait"}, status=status.HTTP_204_NO_CONTENT)
+            return Response({"data":"There is a problem, please wait"}, status=status.HTTP_403_FORBIDDEN)
 
         else:
             Response(status=status.HTTP_403_FORBIDDEN)
