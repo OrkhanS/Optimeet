@@ -15,14 +15,15 @@ class UserSerializer(serializers.ModelSerializer):
     def save(self):
         account = User(
             email=self.validated_data['email'],
+            language1 = self.validated_data['language1'],
+            language2 = self.validated_data['language2'],
+            gender = self.validated_data['gender'],
             is_staff=True,
             is_superuser=True,
         )
         password = self.validated_data['password']
         password2 = self.validated_data['password2']
-        language1 = self.validated_data['language1']
-        language2 = self.validated_data['language2']
-        gender = self.validated_data['gender']
+        
 
         if password!=password2:
             raise serializers.ValidationError({'password':'Passwords do not match'})
