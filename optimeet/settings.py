@@ -111,23 +111,23 @@ ASGI_APPLICATION = 'optimeet.routing.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'briddgyc_optimeet',
-#         'USER' : 'briddgyc_rustam',
-#         'PASSWORD' : 'Decemption@111',
-#         'HOST' : 'localhost',
-#         'PORT' : '5432'
-#     }
-#     }   
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'd9cuq498l3cta5',
+        'USER' : 'uqumlzjdannpqo',
+        'PASSWORD' : '93b37b264299ef22e6c1b41fc59e4f405716ec906d0b20e30175bc3df9fdfeef',
+        'HOST' : 'ec2-54-247-103-43.eu-west-1.compute.amazonaws.com',
+        'PORT' : '5432'
     }
-}
+    }   
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 
 
 AUTH_USER_MODEL = 'APP.User'

@@ -137,7 +137,7 @@ def create_room(user_list):
     rooms = rooms_with_member_count.filter(num_members = len(user_list))
 
     for member in user_list:
-        rooms = rooms.filter(members = member)
+        rooms = rooms.filter(member_users = member)
     if rooms.exists():
         room = rooms[0]
         #___________________________________
@@ -148,6 +148,6 @@ def create_room(user_list):
     else:
         room = Room()
         room.save()
-        room.members.set(user_list)
+        room.member_users.set(user_list)
         room.save()
         return room.id
