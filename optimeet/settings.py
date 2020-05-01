@@ -43,10 +43,23 @@ INSTALLED_APPS = [
     'django_filters',
     'simple_email_confirmation',
 ]
+#CHANNEL_LAYERS = {
+#    "default": {
+#        "BACKEND": "channels.layers.InMemoryChannelLayer"
+#    }
+#}
+
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            # "hosts":{
+            #     "address":("ec2-52-73-83-181.compute-1.amazonaws.com", 16879),
+            #     "password":"pffb161d89705d6c46c9a08e8c709a5fee7089998e540f9e4b17c1b31c71a3d03"
+            # }
+            'hosts': [os.environ.get('REDIS_URL')],
+        },
+    },
 }
 
 ROOT_URLCONF = 'APP.urls'
