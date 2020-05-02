@@ -32,6 +32,7 @@ urlpatterns = [
     #------------------------------------------Suggestions--------------------------------------
     url(r'api/match/$', IwantToMatchSomeone.as_view(),name="Get Your Match"),
     
+    
     #------------------------------------------Posts--------------------------------------
     url(r'api/posts/', PostList.as_view(),name="Posts"),
     url(r'api/my/posts/', PostsOfCurrentUser.as_view(),name="Posts"),
