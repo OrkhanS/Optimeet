@@ -222,7 +222,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     if member.userAccess == True:
                         if notifyUser.deviceToken != 'None' or notifyUser.deviceToken != '':
                             push_service = FCMNotification(
-                                api_key="AAAAwAjLnHQ:APA91bHjo7E7EvA2FwmL-VpoAK8eRrwA9_BCa8H7U1VaxIlEzJ29Jqr7iUWzGARBLyLKD_yGsTbbHZCUkSWBepkUeZ0ExHS8cp3zpcbNvBsubzn4Simnux2NUIAs8X2uvWCQIbl8jEWh")
+                                api_key="AAAAinQp9PE:APA91bEZ0S6YENxW0N9D4b2CVF_GYSrM4rRp_BvDnSxdQOvwLy30DlHb8AhXXF7YEpPT07r5FDIYo0ek3m-p0gGMBzB9o8bH08MiKX7D7NxhHtGp6oVEt2uX8XStfPKwRdrl7kamgOl9")
                             registration_id = notifyUser.deviceToken
                             message_title = self.user.first_name
                             message_body = self.message_safe
