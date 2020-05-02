@@ -215,7 +215,7 @@ class IwantToMatchSomeone(APIView):
             return Response({"data":"There is a problem, please wait"}, status=status.HTTP_403_FORBIDDEN)
 
         else:
-            Response(status=status.HTTP_403_FORBIDDEN)
+            return Response(status=status.HTTP_403_FORBIDDEN)
     # to say I don't want to match today
     def delete(self, request, id):
         request = self.request
